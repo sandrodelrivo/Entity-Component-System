@@ -2,7 +2,9 @@ package io.github.walbusindustries.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author WalbusIndustries
@@ -31,6 +33,26 @@ public class Engine {
 	}
 
 	/**
+	 * Method that returns all entities with the specified component
+	 * 
+	 * @param componentType (ex. "Position.class")
+	 * @return Set containing all entities(integers) with the component
+	 */
+	public <T extends Component> Set<Integer> getEntitiesWithType(Class<T> componentType) {
+		
+		// Creates a hashmap of the entities under that component type.
+		HashMap<Integer, ? extends Component> stored = componentMap.get(componentType);
+		
+		// If there are no entities the function returns a blank hashset
+		if (stored == null) {
+			return new HashSet<Integer>();
+		}
+	
+		return stored.keySet();
+		
+	}
+	
+	/**
 	 * Method to add a component to an entity
 	 * <p>
 	 * The method takes in an entity and a component and adds the component to
@@ -39,6 +61,7 @@ public class Engine {
 	 * @param entity
 	 * @param component - Any subclass of component
 	 */
+	@SuppressWarnings("unchecked")
 	public <T extends Component> void addComponent(int entity, T component) {
 
 		// Creates a hash map of what is in the that component's storage
@@ -59,13 +82,8 @@ public class Engine {
 
 		}
 
-		// Hashmap of entity and component
-		HashMap<Integer, ? extends Component> ec = new HashMap<>();
-
-		((HashMap<Integer, T>) ec).put(entity, component);
-
-		// Place final entity-component pair into the component-type (T).
-		componentMap.put(component.getClass(), ec);
+		// Cast stored to correct hashmap and put the entity and component
+		((HashMap<Integer, T>)stored).put(entity, component);
 
 		System.out.println(component.getClass() + " Component added to entity - " + entity);
 
@@ -75,7 +93,7 @@ public class Engine {
 	 * Method to get the component of the specified entity
 	 * 
 	 * @param entity
-	 * @param componentType - The type of component you want to access ("SubComponent.class")
+	 * @param componentType - The type of component you want to access ("S.class")
 	 * @return T - A type that extends component - ie. the component of the entity
 	 */
 	public <T extends Component> T getComponent(int entity, Class<T> componentType) {
