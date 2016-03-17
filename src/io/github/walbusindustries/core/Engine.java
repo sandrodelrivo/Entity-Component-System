@@ -18,7 +18,7 @@ public class Engine {
 	/**
 	 * 
 	 */
-	HashMap<Class<?>, HashMap<Integer, ? extends Component>> componentMap;
+	private HashMap<Class<?>, HashMap<Integer, ? extends Component>> componentMap;
 
 	// Vector containing all of the entity systems in the project.
 	// All entity systems that the program will run will need to be added to
@@ -32,6 +32,27 @@ public class Engine {
 		componentMap = new HashMap<>();
 	}
 
+	/**
+	 * Method that tells you whether or not an entity possesses a certain component.
+	 * <p>
+	 * Pass in a component and an entity and it will access the component map and return
+	 * a boolean. True if it is possessed. False if it is does not.
+	 * @param entity
+	 * @param componentType
+	 * @return Boolean. True if the entity has the component. False if not
+	 */
+	public <T> Boolean hasComponent(Integer entity, Class<T> componentType) {
+		
+		// Creates a hashmap of all entity-component pairs within the component
+		HashMap<Integer, ? extends Component> stored = componentMap.get(componentType);
+		if (stored.get(entity) != null) {
+			return true;
+		} else {
+			return false;
+		}
+		
+	}
+	
 	/**
 	 * Method that returns all entities with the specified component
 	 * 
@@ -73,8 +94,8 @@ public class Engine {
 		// if the stored is null - ie. no entities already use this component.
 		if (stored == null) {
 
-			// Create a hashmap of an integer and a type (the component)
-			stored = new HashMap<Integer, T>();
+			// Initialize the Hashmap
+			stored = new HashMap<>();
 
 			// Add this new hashmap to the component map so that the entity can
 			// be placed
