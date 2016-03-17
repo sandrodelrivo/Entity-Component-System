@@ -5,6 +5,8 @@ package io.github.walbusindustries.core;
  * @version 0.1
  * @since 2016-03-10
  */
-public class EntitySystem {
+public abstract class EntitySystem {
+
+	public abstract void process();
 
 }

@@ -1,6 +1,8 @@
 package io.github.walbusindustries.core;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author WalbusIndustries
@@ -9,19 +11,58 @@ import java.util.Vector;
  */
 public class Engine {
 
+	List<Integer> allEntities;
+	HashMap<Class<?>, HashMap<Integer, ? extends Component>> componentMap;
+
 	// Vector containing all of the entity systems in the project.
 	// All entity systems that the program will run will need to be added to
 	// this list.
-	private Vector<EntitySystem> entitySystems;
+	private ArrayList<EntitySystem> entitySystems = new ArrayList<EntitySystem>();
 
 	int eCount = 0;
+
+	public Engine() {
+		allEntities = new ArrayList<Integer>();
+		// componentMap = new HashMap<Integer, ArrayList<Component>>();
+	}
+
+	public <T extends Component> void addComponent(int entity, T component) {
+
+		// Creates a hashmap of
+		// HashMap<Integer, ? extends Component> stored = componentMap
+		// .get(component.getClass());
+
+		if (componentMap.get(component.getClass()).get(entity) == null) {
+			
+			componentMap.get(component.getClass()).put(entity, );
+			
+		}
+
+		/*
+		 * if (componentMap.get(entity) == null) componentMap.put(entity, new
+		 * ArrayList<Component>());
+		 * 
+		 * componentMap.get(entity).add(component);
+		 */
+
+	}
+
+	public Component getComponent(int entity, Component component) {
+
+		/*
+		 * Component result = componentMap.get(entity).;
+		 * 
+		 * return result;
+		 */
+
+	}
 
 	/**
 	 * Method to access the entity systems of the engine.
 	 * 
 	 * @return The vector containing all of the entity systems.
 	 */
-	public Vector<EntitySystem> getEntitySystems() {
+	private ArrayList<EntitySystem> getEntitySystems() {
 
 		return entitySystems;
 	}
@@ -40,6 +81,8 @@ public class Engine {
 		int e = eCount;
 		eCount++;
 
+		allEntities.add(e);
+
 		return e;
 
 	}
@@ -53,9 +96,7 @@ public class Engine {
 	 *            - Entity System
 	 */
 	public void addSystem(EntitySystem es) {
-
 		entitySystems.add(es);
-
 	}
 
 	/**
@@ -65,6 +106,15 @@ public class Engine {
 	 * method must be called during whenever the game updates its logic.
 	 */
 	public void update() {
+
+		if (entitySystems.isEmpty() == false) {
+
+			for (int i = 0; i < entitySystems.size(); i++) {
+
+				entitySystems.get(i).process();
+
+			}
+		}
 
 	}
 
