@@ -12,6 +12,10 @@ import java.util.List;
 public class Engine {
 
 	List<Integer> allEntities;
+
+	/**
+	 * 
+	 */
 	HashMap<Class<?>, HashMap<Integer, ? extends Component>> componentMap;
 
 	// Vector containing all of the entity systems in the project.
@@ -22,38 +26,78 @@ public class Engine {
 	int eCount = 0;
 
 	public Engine() {
-		allEntities = new ArrayList<Integer>();
-		// componentMap = new HashMap<Integer, ArrayList<Component>>();
+		allEntities = new ArrayList<>();
+		componentMap = new HashMap<>();
 	}
 
+	/**
+	 * Method to add a component to an entity
+	 * <p>
+	 * The method takes in an entity and a component and adds the component to
+	 * the entity in the engine's componentMap
+	 * 
+	 * @param entity
+	 * @param component - Any subclass of component
+	 */
 	public <T extends Component> void addComponent(int entity, T component) {
 
-		// Creates a hashmap of
-		// HashMap<Integer, ? extends Component> stored = componentMap
-		// .get(component.getClass());
+		// Creates a hash map of what is in the that component's storage
+		// This hash map is an integer and its component
+		// This hash map will be put into the main component store under
+		// the component type (generic class)
+		HashMap<Integer, ? extends Component> stored = componentMap.get(component.getClass());
 
-		if (componentMap.get(component.getClass()).get(entity) == null) {
-			
-			componentMap.get(component.getClass()).put(entity, );
-			
+		// if the stored is null - ie. no entities already use this component.
+		if (stored == null) {
+
+			// Create a hashmap of an integer and a type (the component)
+			stored = new HashMap<Integer, T>();
+
+			// Add this new hashmap to the component map so that the entity can
+			// be placed
+			componentMap.put(component.getClass(), stored);
+
 		}
 
-		/*
-		 * if (componentMap.get(entity) == null) componentMap.put(entity, new
-		 * ArrayList<Component>());
-		 * 
-		 * componentMap.get(entity).add(component);
-		 */
+		// Hashmap of entity and component
+		HashMap<Integer, ? extends Component> ec = new HashMap<>();
+
+		((HashMap<Integer, T>) ec).put(entity, component);
+
+		// Place final entity-component pair into the component-type (T).
+		componentMap.put(component.getClass(), ec);
+
+		System.out.println(component.getClass() + " Component added to entity - " + entity);
 
 	}
 
-	public Component getComponent(int entity, Component component) {
+	/**
+	 * Method to get the component of the specified entity
+	 * 
+	 * @param entity
+	 * @param componentType - The type of component you want to access ("SubComponent.class")
+	 * @return T - A type that extends component - ie. the component of the entity
+	 */
+	public <T extends Component> T getComponent(int entity, Class<T> componentType) {
 
-		/*
-		 * Component result = componentMap.get(entity).;
-		 * 
-		 * return result;
-		 */
+		// A hashmap that contains the the hashmap under the componentType
+		HashMap<Integer, ? extends Component> stored = componentMap.get(componentType);
+
+		// If there is no entity-component map stored under that component
+		if (stored == null) {
+			throw new IllegalArgumentException("There are no entities with a Component of class: " + componentType);
+		}
+
+		// Creates a type that extends component that has the component stored
+		// under the entity
+		T comp = componentType.cast(stored.get(entity));
+
+		// If comp is null - ie. there is no entity with that type
+		if (comp == null)
+			throw new IllegalArgumentException(
+					"Entity - " + entity + " does not have a component of this type \n   missing: " + componentType);
+
+		return comp;
 
 	}
 
