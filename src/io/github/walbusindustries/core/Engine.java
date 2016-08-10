@@ -1,6 +1,8 @@
 package io.github.walbusindustries.core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,36 +15,36 @@ import java.util.Set;
  */
 public class Engine {
 
-	List<Integer> allEntities;
+	static List<Integer> allEntities;
 
-	/**
-	 * 
-	 */
-	private HashMap<Class<?>, HashMap<Integer, ? extends Component>> componentMap;
+	private static HashMap<Class<?>, HashMap<Integer, ? extends Component>> componentMap;
 
 	// Vector containing all of the entity systems in the project.
 	// All entity systems that the program will run will need to be added to
 	// this list.
-	private ArrayList<EntitySystem> entitySystems = new ArrayList<EntitySystem>();
+	private static ArrayList<EntitySystem> entitySystems = new ArrayList<EntitySystem>();
 
-	int eCount = 0;
+	static int eCount = 0;
 
 	public Engine() {
+		System.out.println("--Initializing Engine Class--");
 		allEntities = new ArrayList<>();
 		componentMap = new HashMap<>();
 	}
 
 	/**
-	 * Method that tells you whether or not an entity possesses a certain component.
+	 * Method that tells you whether or not an entity possesses a certain
+	 * component.
 	 * <p>
-	 * Pass in a component and an entity and it will access the component map and return
-	 * a boolean. True if it is possessed. False if it is does not.
+	 * Pass in a component and an entity and it will access the component map
+	 * and return a boolean. True if it is possessed. False if it is does not.
+	 * 
 	 * @param entity
 	 * @param componentType
 	 * @return Boolean. True if the entity has the component. False if not
 	 */
-	public <T> Boolean hasComponent(Integer entity, Class<T> componentType) {
-		
+	public static <T extends Component> Boolean hasComponent(Integer entity, Class<T> componentType) {
+
 		// Creates a hashmap of all entity-component pairs within the component
 		HashMap<Integer, ? extends Component> stored = componentMap.get(componentType);
 		if (stored.get(entity) != null) {
@@ -50,29 +52,30 @@ public class Engine {
 		} else {
 			return false;
 		}
-		
+
 	}
-	
+
 	/**
 	 * Method that returns all entities with the specified component
 	 * 
-	 * @param componentType (ex. "Position.class")
+	 * @param componentType
+	 *            (ex. "Position.class")
 	 * @return Set containing all entities(integers) with the component
 	 */
-	public <T extends Component> Set<Integer> getEntitiesWithType(Class<T> componentType) {
-		
+	public static <T extends Component> Set<Integer> getEntitiesWithType(Class<T> componentType) {
+
 		// Creates a hashmap of the entities under that component type.
 		HashMap<Integer, ? extends Component> stored = componentMap.get(componentType);
-		
+
 		// If there are no entities the function returns a blank hashset
 		if (stored == null) {
 			return new HashSet<Integer>();
 		}
-	
+
 		return stored.keySet();
-		
+
 	}
-	
+
 	/**
 	 * Method to add a component to an entity
 	 * <p>
@@ -80,10 +83,11 @@ public class Engine {
 	 * the entity in the engine's componentMap
 	 * 
 	 * @param entity
-	 * @param component - Any subclass of component
+	 * @param component
+	 *            - Any subclass of component
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends Component> void addComponent(int entity, T component) {
+	public static <T extends Component> void addComponent(int entity, T component) {
 
 		// Creates a hash map of what is in the that component's storage
 		// This hash map is an integer and its component
@@ -104,7 +108,9 @@ public class Engine {
 		}
 
 		// Cast stored to correct hashmap and put the entity and component
-		((HashMap<Integer, T>)stored).put(entity, component);
+		((HashMap<Integer, T>) stored).put(entity, component);
+
+		addEntityToSystems(entity);
 
 		System.out.println(component.getClass() + " Component added to entity - " + entity);
 
@@ -114,10 +120,13 @@ public class Engine {
 	 * Method to get the component of the specified entity
 	 * 
 	 * @param entity
-	 * @param componentType - The type of component you want to access ("S.class")
-	 * @return T - A type that extends component - ie. the component of the entity
+	 * @param componentType
+	 *            - The type of component you want to access ("S.class")
+	 * @return T - The instance of the component class that is paired with the
+	 *         entity. ex. engine.getComponent(entity,
+	 *         ExampleComponent.class).exampleVar = 5;
 	 */
-	public <T extends Component> T getComponent(int entity, Class<T> componentType) {
+	public static <T extends Component> T getComponent(int entity, Class<T> componentType) {
 
 		// A hashmap that contains the the hashmap under the componentType
 		HashMap<Integer, ? extends Component> stored = componentMap.get(componentType);
@@ -140,12 +149,44 @@ public class Engine {
 
 	}
 
+	public static ArrayList<Component> getAllComponents(int e) {
+
+		// Get All Entity-Component pairs from value list
+		Collection<HashMap<Integer, ? extends Component>> stored = componentMap.values();
+
+		// Create an array list to hold all the entities with their components
+		ArrayList<HashMap<Integer, ? extends Component>> allPairs = new ArrayList<>();
+		allPairs.addAll(stored);
+
+		System.out.println("Amount of Entity-Component Pairs: " + allPairs.size());
+		System.out.println("Pairs As Follows: ");
+		for (int i = 0; i < allPairs.size(); i++) {
+			System.out.println(allPairs.get(i));
+		}
+
+		ArrayList<Component> components = new ArrayList<>();
+
+		for (int i = 0; i < allPairs.size(); i++) {
+
+			if (allPairs.get(i).containsKey(e)) {
+				components.add(allPairs.get(i).get(e));
+			}
+
+			System.out.println("Components of Entity: " + e + " as follows " + components);
+			System.out.println(" ");
+
+		}
+
+		return components;
+
+	}
+
 	/**
 	 * Method to access the entity systems of the engine.
 	 * 
 	 * @return The vector containing all of the entity systems.
 	 */
-	private ArrayList<EntitySystem> getEntitySystems() {
+	private static ArrayList<EntitySystem> getEntitySystems() {
 
 		return entitySystems;
 	}
@@ -159,7 +200,7 @@ public class Engine {
 	 * 
 	 * @return A unique id.
 	 */
-	public int create() {
+	public static int create() {
 
 		int e = eCount;
 		eCount++;
@@ -178,8 +219,46 @@ public class Engine {
 	 * @param es
 	 *            - Entity System
 	 */
-	public void addSystem(EntitySystem es) {
+	public static void addSystem(EntitySystem es) {
+
 		entitySystems.add(es);
+	}
+
+	/**
+	 * Runs every time a new component is added to an entity. The function
+	 * determines what systems the component belongs to and adds the entity to
+	 * the system's internal component list.
+	 * 
+	 * Also runs for every entity every time a new entity system is created.
+	 * 
+	 * @param e
+	 *            - Entity
+	 */
+	private static void addEntityToSystems(int e) {
+
+		ArrayList<Component> components = getAllComponents(e);
+		ArrayList<Class<? extends Component>> componentTypes = new ArrayList<>();
+
+		for (Component comp : components) {
+
+			componentTypes.add(comp.getClass());
+
+		}
+
+		for (int i = 0; i < entitySystems.size(); i++) {
+
+			System.out.println("Entity Component Types: " + componentTypes);
+			System.out.println("System acting types: " + entitySystems.get(i).getActingTypes());
+
+			if (componentTypes.equals(entitySystems.get(i).getActingTypes())) {
+
+				System.out.println("Added Entity: " + e + " to Entity System: " + entitySystems.get(i));
+				entitySystems.get(i).addEntity(e);
+
+			}
+
+		}
+
 	}
 
 	/**
@@ -188,15 +267,10 @@ public class Engine {
 	 * This engine is designed to be used within any game engine so this update
 	 * method must be called during whenever the game updates its logic.
 	 */
-	public void update() {
+	public static void update() {
 
-		if (entitySystems.isEmpty() == false) {
-
-			for (int i = 0; i < entitySystems.size(); i++) {
-
-				entitySystems.get(i).process();
-
-			}
+		for (int i = 0; i < entitySystems.size(); i++) {
+			entitySystems.get(i).process();
 		}
 
 	}
