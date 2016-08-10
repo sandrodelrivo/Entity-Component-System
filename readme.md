@@ -1,3 +1,4 @@
-# Parakeet-CS
+# Entity Component System
 
-Parakeet Component System is an entity-component system that is in development in Java.
+
+Basic Entity Component System in development in Java.
