@@ -6,7 +6,7 @@ import java.util.Set;
 
 /**
  * @author WalbusIndustries
- * @version 0.1
+ * @version 0.2
  * @since 2016-03-10
  */
 public abstract class EntitySystem {
